@@ -29,6 +29,19 @@
 - Utilizar o Flyway como ferramenta de Migrations do projeto;
 - Realizar validações com Bean Validation utilizando algumas de suas anotações, como a `@NotBlank`.
 
+# Aula 4
+- Utilizar a anotacao `@GetMapping` para mapear os metodos em Controllers que produzem dados;
+- Utilizar a interface `Pageable` do Spring para realizar consultas com paginacao;
+- Controlar a paginação e a ordenação dos dados devolvidos pela API com os parâmetros `page`, `size` e `sort`;
+- Configurar o projeto para que os comandos SQL sejam exibidos no console.
+
+# Aula 5
+- Mapear requisições PUT com a anotação `@PutMapping`;
+- Escrever um código para atualizar informações de um registro no banco de dados;
+- Mapear requisições DELETE com a anotação `@DeleteMapping`;
+- Mapear parâmetros dinâmicos em URL com a anotação `@PathVariable`;
+- Implementar o conceito de exclusão lógica com o uso de um atributo booleano.
+
 
 
 ## Para saber mais: classes DAO
@@ -154,3 +167,68 @@ public class Categoria {
 ```
 - Ao retornar um objeto do tipo `Produto` no Controller, o Spring teria problemas para gerar o JSON desse objeto, causando uma exception do tipo `StackOverflowError`. Esse problema ocorre porque o objeto produto tem um atributo do tipo `Categoria` , que por sua vez tem um atributo do tipo `List<Produto>`, causando assim um loop infinito no processo de serialização para JSON.
 - Tal problema pode ser resolvido com a utilizacao da anotacao `@JsonIgnore` ou com a utilizacao das anotacoes `@JsonBackReference` e `@JsonManagedReference`, mas também poderia ser evitado com a **utilização de um DTO** que representa apenas os dados que devem ser devolvidos no JSON.
+
+## Para saber mais: parametros de paginacao
+- Conforme aprendemos nos vídeos anteriores, por padrão, os parâmetros utilizados para realizar a paginação e a ordenação devem se chamar `page`, `size` e `sort`. Entretanto, o Spring Boot permite que os nomes de tais parâmetros sejam modificados via configuração no arquivo `application.properties`.
+- Por exemplo, poderíamos traduzir para português os nomes desses parâmetros com as seguintes propriedades:
+```properties
+spring.data.web.pageable.page-parameter=pagina
+spring.data.web.pageable.size-parameter=tamanho
+spring.data.web.sort.sort-parameter=ordem
+```
+- Com isso, nas requisições que utilizam paginação, devemos utilizar esses nomes que foram definidos. Por exemplo, para listar os médicos de nossa API trazendo apenas 5 registros da página 2, ordenados pelo e-mail e de maneira decrescente, a URL da requisição deve ser:
+`http://localhost:8080/medicos?tamanho=5&pagina=1&ordem=email,desc`
+
+## Para saber mais: Mass Assignment Attack
+- Mass Assignment Attack ou Ataque de Atribuição em Massa, em português, ocorre quando um usuário é capaz de inicializar ou substituir parâmetros que não deveriam ser modificados na aplicação. Ao incluir parâmetros adicionais em uma requisição, sendo tais parâmetros válidos, um usuário mal-intencionado pode gerar um efeito colateral indesejado na aplicação.
+- O conceito desse ataque refere-se a quando você injeta um conjunto de valores diretamente em um objeto, daí o nome atribuição em massa, que sem a devida validação pode causar sérios problemas.
+- Vamos a um exemplo prático. Suponha que você tem o seguinte método, em uma classe Controller, utilizado para cadastrar um usuário na aplicação:
+```java
+@PostMapping
+@Transactional
+public void cadastrar(@RequestBody @Valid Usuario usuario) {
+    repository.save(usuario);
+}
+```
+- E a entidade JPA que representa o usuario:
+```java
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(of = "id")
+@Entity(name = "Usuario")
+@Table(name = "usuarios")
+public class Usuario {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String nome;
+    private String email;
+    private Boolean admin = false;
+
+    //restante do código omitido…
+}
+```
+- Repare que o atributo `admin` da classe `Usuario` e iniciado como `false`, indicando que um usuario deve sempre ser cadastrado como nao sendo um administrador. Porem, se na requisicao for enviado o seguinte JSON:
+```JSON
+{
+  “nome” : “Rodrigo”,
+  “email” : “rodrigo@email.com”,
+  “admin” : true
+}
+```
+- O usuario sera cadastrado com o atributo `admin` preenchido como `true`. Isso acontece porque o atributo enviado no JSON existe na classe que esta sendo recebida no Controller, sendo considerado entao um atributo valido e que sera preenchido no objeto `Usuario` que sera instanciado pelo Spring.
+### Prevencao
+- O uso do padrão DTO nos ajuda a evitar esse problema, pois ao criar um DTO definimos nele apenas os campos que podem ser recebidos na API, e no exemplo anterior o DTO não teria o atributo `admin`.
+- Novamente, vemos mais uma vantagem de se utilizar o padrão DTO para representar os dados que chegam e saem da API.
+
+## Para saber mais: PUT ou PATCH?
+- Escolher entre o método HTTP PUT ou PATCH é uma dúvida comum que surge quando estamos desenvolvendo APIs e precisamos criar um endpoint para atualização de recursos. Vamos entender as diferenças entre as duas opções e quando utilizar cada uma.
+### PUT
+- O método PUT substitui todos os atuais dados de um recurso pelos dados passados na requisição, ou seja, estamos falando de uma atualização integral. Então, com ele, fazemos a atualização total de um recurso em apenas uma requisição.
+### PATCH
+- O método PATCH, por sua vez, aplica modificações parciais em um recurso. Logo, é possível modificar apenas uma parte de um recurso. Com o PATCH, então, realizamos atualizações parciais, o que torna as opções de atualização mais flexíveis.
+### Qual escolher? 
+- Na prática, é difícil saber qual método utilizar, pois nem sempre saberemos se um recurso será atualizado parcialmente ou totalmente em uma requisição - a não ser que realizemos uma verificação quanto a isso, algo que não é recomendado.
+- O mais comum então nas aplicações é utilizar o método PUT para requisições de atualização de recursos em uma API, sendo essa a nossa escolha no projeto utilizado ao longo deste curso.
