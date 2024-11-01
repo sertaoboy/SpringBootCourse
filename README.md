@@ -14,6 +14,8 @@
 > https://http.dog/ <br>
 - Fundamentos de REST:
 > https://www.alura.com.br/artigos/rest-conceito-e-fundamentos <br>
+- Documentacao - Application Properties SpringBoot:
+> https://docs.spring.io/spring-boot/appendix/application-properties/index.html <br>
 
 # Aula 1
 - Criar um projeto Spring Boot utilizando o site Spring Initializr;
@@ -265,3 +267,7 @@ public class Usuario {
 - É um erro menos comum, mas de vez em quando ele aparece. Esse erro significa que há um problema com alguma das bases que faz uma aplicação rodar. Esse erro pode ser, basicamente, no servidor que mantém a aplicação no ar ou na comunicação com o sistema de arquivos, que fornece a infraestrutura para a aplicação.
 ### Error 503
 - O erro 503 significa que o serviço acessado está temporariamente indisponível. Causas comuns são um servidor em manutenção ou sobrecarregado. Ataques maliciosos, como o DDoS, causam bastante esse problema.
+
+## Para saber mais: propriedades do Spring Boot
+- Ao longo dos cursos, tivemos que adicionar algumas propriedades no arquivo `application.properties` para realizar configurações no projeto, como, por exemplo, as configurações de acesso ao banco de dados.
+- O Spring Boot possui centenas de propriedades que podemos incluir nesse arquivo, sendo impossível memorizar todas elas. Sendo assim, é importante conhecer a documentação que lista todas essas propriedades, pois eventualmente precisaremos consultá-la.
