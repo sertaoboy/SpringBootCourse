@@ -213,7 +213,7 @@ public class Usuario {
 }
 ```
 - Repare que o atributo `admin` da classe `Usuario` e iniciado como `false`, indicando que um usuario deve sempre ser cadastrado como nao sendo um administrador. Porem, se na requisicao for enviado o seguinte JSON:
-```JSON
+```
 {
   “nome” : “Rodrigo”,
   “email” : “rodrigo@email.com”,
