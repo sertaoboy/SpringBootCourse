@@ -42,6 +42,8 @@
 - Mapear parâmetros dinâmicos em URL com a anotação `@PathVariable`;
 - Implementar o conceito de exclusão lógica com o uso de um atributo booleano.
 
+> Regras de negocio seguidos no curso: https://trello.com/b/O0lGCsKb/api-voll-med <br>
+
 
 
 ## Para saber mais: classes DAO
