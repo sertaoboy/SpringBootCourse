@@ -16,6 +16,12 @@
 > https://www.alura.com.br/artigos/rest-conceito-e-fundamentos <br>
 - Documentacao - Application Properties SpringBoot:
 > https://docs.spring.io/spring-boot/appendix/application-properties/index.html <br>
+- Documentacao - JPA; Spring Data:
+> https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html <br>
+- CSRF Attacks:
+> https://owasp.org/www-community/attacks/csrf <br>
+- JWT Tokens:
+> https://jwt.io/ <br>
 
 # Aula 1
 - Criar um projeto Spring Boot utilizando o site Spring Initializr;
@@ -54,6 +60,32 @@
 - Modificar o codigo HTTP devolvido nas respostas API;
 - Adicionar cabecalhos nas respostas da API;
 - Utilizar os codigos HTTP mais apropriados para cada operacao realizada na API.
+
+# Aula 7
+- Criar uma classe para isolar o tratamento de exceptions da API, com a utilização da anotação `@RestControllerAdvice`
+- Utilizar a anotacao `@ExceptionHandler`, do Spring, para indicar qual exception um determinado método da classe de tratamento de erros deve capturar;
+- Tratar erros do tipo 404 (Not Found) na classe de tratamento de erros;
+- Tratar erros do tipo 400 (Bad Request), para erros de validação do Bean Validation, na classe de tratamento de erros;
+- Simplificar o JSON devolvido pela API em casos de erro de validação do Bean Validation.
+
+# Aula 8
+- Como funciona o processo de autenticação e autorização em uma API Rest;
+- Como adicionar o Spring Security ao projeto;
+- Como funciona o comportamento padrão do Spring Security em uma aplicação;
+- Implementar o processo de autenticação na API, de maneira Stateless, utilizando as classes e configurações do Spring Security.
+
+# Aula 9
+- Adicionar a biblioteca `Auth0 java-jwt` como dependência do projeto;
+- Utilizar essa biblioteca para realizar a geração de um token na API;
+- Injetar uma propriedade do arquivo `application.properties` em uma classe gerenciada pelo Spring, utilizando a anotação `@Value`;
+- Devolver um token gerado na API quando um usuário se autenticar nela.
+
+# Aula 10
+- Funcionamento de `Filters` em uma requisicao;
+- Implementar um *filter* criando uma classe que herda da classe `OncePerRequestFilter`, do Spring;
+- Utilizar a biblioteca ***Auth0 java-jwt*** para realizar a validação dos tokens recebidos na API;
+- Realizar o processo de autenticação da requisição, utilizando a classe `SecurityContextHolder`, do Spring;
+- Liberar e restringir requisições, de acordo com a URL e o verbo do protocolo HTTP.
 
 > Regras de negocio seguidos no curso: https://trello.com/b/O0lGCsKb/api-voll-med <br>
 
@@ -271,3 +303,144 @@ public class Usuario {
 ## Para saber mais: propriedades do Spring Boot
 - Ao longo dos cursos, tivemos que adicionar algumas propriedades no arquivo `application.properties` para realizar configurações no projeto, como, por exemplo, as configurações de acesso ao banco de dados.
 - O Spring Boot possui centenas de propriedades que podemos incluir nesse arquivo, sendo impossível memorizar todas elas. Sendo assim, é importante conhecer a documentação que lista todas essas propriedades, pois eventualmente precisaremos consultá-la.
+
+## Para saber mais: mensagens de erro em português
+- Por padrão o Bean Validation devolve as mensagens de erro em inglês, entretanto existe uma tradução dessas mensagens para o português já implementada nessa especificação.
+- No protocolo HTTP existe um cabeçalho chamado Accept-Language, que serve para indicar ao servidor o idioma de preferência do cliente disparando a requisição. Podemos utilizar esse cabeçalho para indicar ao Spring o idioma desejado, para que então na integração com o Bean Validation ele busque as mensagens de acordo com o idioma indicado.
+- No Insomnia, e também nas outras ferramentas similares, existe uma opção chamada Header que podemos incluir cabeçalhos a serem enviados na requisição. Se adicionarmos o header Accept-Language com o valor pt-br, as mensagens de erro do Bean Validation serão automaticamente devolvidas em português.
+- Obs: O Bean Validation tem tradução das mensagens de erro apenas para alguns poucos idiomas.
+
+## Para saber mais: personalizando mensagens de erro
+- Você deve ter notado que o Bean Validation possui uma mensagem de erro para cada uma de suas anotações. Por exemplo, quando a validação falha em algum atributo anotado com @NotBlank, a mensagem de erro será: *must not be blank*.
+- Essas mensagens de erro não foram definidas na aplicação, pois são mensagens de erro padrão do próprio Bean Validation. Entretanto, caso você queira, pode personalizar tais mensagens.
+- Uma das maneiras de personalizar as mensagens de erro é adicionar o atributo message nas próprias anotações de validação:
+```java
+public record DadosCadastroMedico(
+    @NotBlank(message = "Nome é obrigatório")
+    String nome,
+
+    @NotBlank(message = "Email é obrigatório")
+    @Email(message = "Formato do email é inválido")
+    String email,
+
+    @NotBlank(message = "Telefone é obrigatório")
+    String telefone,
+
+    @NotBlank(message = "CRM é obrigatório")
+    @Pattern(regexp = "\\d{4,6}", message = "Formato do CRM é inválido")
+    String crm,
+
+    @NotNull(message = "Especialidade é obrigatória")
+    Especialidade especialidade,
+
+    @NotNull(message = "Dados do endereço são obrigatórios")
+    @Valid DadosEndereco endereco) {}
+```
+- Outra maneira é isolar as mensagens em um arquivo de propriedades, que deve possuir o nome `ValidationMessages.properties` e ser criado no diretório `src/main/resources`:
+```properties
+nome.obrigatorio=Nome é obrigatório
+email.obrigatorio=Email é obrigatório
+email.invalido=Formato do email é inválido
+telefone.obrigatorio=Telefone é obrigatório
+crm.obrigatorio=CRM é obrigatório
+crm.invalido=Formato do CRM é inválido
+especialidade.obrigatoria=Especialidade é obrigatória
+endereco.obrigatorio=Dados do endereço são obrigatórios
+```
+- E, nas anotações, indicar a chave das propriedades pelo próprio atributo `message`, delimitando com os caracteres `{` e `}`:
+```java
+public record DadosCadastroMedico(
+    @NotBlank(message = "{nome.obrigatorio}")
+    String nome,
+
+    @NotBlank(message = "{email.obrigatorio}")
+    @Email(message = "{email.invalido}")
+    String email,
+
+    @NotBlank(message = "{telefone.obrigatorio}")
+    String telefone,
+
+    @NotBlank(message = "{crm.obrigatorio}")
+    @Pattern(regexp = "\\d{4,6}", message = "{crm.invalido}")
+    String crm,
+
+    @NotNull(message = "{especialidade.obrigatoria}")
+    Especialidade especialidade,
+
+    @NotNull(message = "{endereco.obrigatorio}")
+    @Valid DadosEndereco endereco) {}
+```
+
+## Para saber mais: tipos de autenticação em APIs Rest
+- Existem diversas formas de se realizar o processo de autenticação e autorização em aplicações Web e APIs Rest, sendo que no curso utilizaremos Tokens JWT.
+- Você pode conferir as principais formas de autenticação lendo este artigo: https://www.alura.com.br/artigos/tipos-de-autenticacao
+
+## Para saber mais: hashing de senha
+- Ao implementar uma funcionalidade de autenticação em uma aplicação, independente da linguagem de programação utilizada, você terá que lidar com os dados de login e senha dos usuários, sendo que eles precisarão ser armazenados em algum local, como, por exemplo, um banco de dados.
+- Senhas são informações sensíveis e não devem ser armazenadas em texto aberto, pois se uma pessoa mal intencionada conseguir obter acesso ao banco de dados, ela conseguirá ter acesso às senhas de todos os usuários. Para evitar esse problema, você deve sempre utilizar algum algoritmo de hashing nas senhas antes de armazená-las no banco de dados.
+- Hashing nada mais é do que uma função matemática que converte um texto em outro texto totalmente diferente e de difícil dedução. Por exemplo, o texto Meu nome é Rodrigo pode ser convertido para o texto 8132f7cb860e9ce4c1d9062d2a5d1848, utilizando o algoritmo de hashing MD5.
+- Um detalhe importante é que os algoritmos de hashing devem ser de mão única, ou seja, não deve ser possível obter o texto original a partir de um hash. Dessa forma, para saber se um usuário digitou a senha correta ao tentar se autenticar em uma aplicação, devemos pegar a senha que foi digitada por ele e gerar o hash dela, para então realizar a comparação com o hash que está armazenado no banco de dados.
+- Existem diversos algoritmos de hashing que podem ser utilizados para fazer essa transformação nas senhas dos usuários, sendo que alguns são mais antigos e não mais considerados seguros hoje em dia, como o MD5 e o SHA1. Os principais algoritmos recomendados atualmente são:
+1. Bcrypt
+2. Scrypt
+3. Argon2
+4. PBKDF2
+- Ao longo do curso utilizaremos o algoritmo BCrypt, que é bastante popular atualmente. Essa opção também leva em consideração o fato de que o Spring Security já nos fornece uma classe que o implementa.
+
+## Para saber mais: documentação Spring Data
+- Conforme aprendido em vídeos anteriores, o Spring Data utiliza um padrão próprio de nomenclatura de métodos que devemos seguir para que ele consiga gerar as queries SQL de maneira correta.
+- Existem algumas palavras reservadas que devemos utilizar nos nomes dos métodos, como o `findBy` e o `existsby`, para indicar ao Spring Data como ele deve montar a consulta que desejamos.Esse recurso é bastante flexível, podendo ser um pouco complexo devido às diversas possibilidades existentes.
+
+## Para saber mais: JSON Web Token
+- JSON Web Token, ou JWT, é um padrão utilizado para a geração de tokens, que nada mais são do que Strings, representando, de maneira segura, informações que serão compartilhadas entre dois sistemas.
+- Explicacao: https://www.alura.com.br/artigos/o-que-e-json-web-tokens
+
+## Para saber mais: Outras informações no token
+- Além do Issuer, Subject e data de expiração, podemos incluir outras informações no token JWT, de acordo com as necessidades da aplicação. Por exemplo, podemos incluir o id do usuário no token, para isso basta utilizar o método `withClaim`:
+```java
+return JWT.create()
+    .withIssuer("API Voll.med")
+    .withSubject(usuario.getLogin())
+
+    .withClaim("id", usuario.getId())
+
+    .withExpiresAt(dataExpiracao())
+    .sign(algoritmo);
+```
+- O método `withClaim` recebe dois parâmetros, sendo o primeiro uma String que identifica o nome do claim (propriedade armazenada no token), e o segundo a informação que se deseja armazenar.
+
+## Para saber mais: Filters
+- Filter é um dos recursos que fazem parte da especificação de Servlets, a qual padroniza o tratamento de requisições e respostas em aplicações Web no Java. Ou seja, tal recurso não é específico do Spring, podendo assim ser utilizado em qualquer aplicação Java.
+- É um recurso muito útil para isolar códigos de infraestrutura da aplicação, como, por exemplo, segurança, logs e auditoria, para que tais códigos não sejam duplicados e misturados aos códigos relacionados às regras de negócio da aplicação.
+- Para criar um Filter, basta criar uma classe e implementar nela a interface `Filter` (pacote jakarta.servlet). Por exemplo:
+```java
+@WebFilter(urlPatterns = "/api/**")
+public class LogFilter implements Filter {
+
+    @Override
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+        System.out.println("Requisição recebida em: " + LocalDateTime.now());
+        filterChain.doFilter(servletRequest, servletResponse);
+    }
+
+}
+```
+- O método `doFilter` é chamado pelo servidor automaticamente, sempre que esse filter tiver que ser executado, e a chamada ao método `filterChain.doFilter` indica que os próximos filters, caso existam outros, podem ser executados. A anotação @`WebFilter`, adicionada na classe, indica ao servidor em quais requisições esse filter deve ser chamado, baseando-se na URL da requisição.
+- No curso, utilizaremos outra maneira de implementar um filter, usando recursos do Spring que facilitam sua implementação.
+
+## Para saber mais: controle de acesso por anotacoes
+- Outra maneira de restringir o acesso a determinadas funcionalidades, com base no perfil dos usuários, é com a utilização de um recurso do Spring Security conhecido como Method Security, que funciona com a utilização de anotações em métodos:
+```java
+@GetMapping("/{id}")
+@Secured("ROLE_ADMIN")
+public ResponseEntity detalhar(@PathVariable Long id) {
+    var medico = repository.getReferenceById(id);
+    return ResponseEntity.ok(new DadosDetalhamentoMedico(medico));
+}
+```
+- No exemplo de código anterior o método foi anotado com `@Secured("ROLE_ADMIN")`, para que apenas usuários com o perfil **ADMIN** possam disparar requisições para detalhar um médico. A anotação `@Secured` pode ser adicionada em métodos individuais ou mesmo na classe, que seria o equivalente a adicioná-la em todos os métodos.
+- Atenção! Por padrão esse recurso vem desabilitado no spring Security, sendo que para o utilizar devemos adicionar a seguinte anotação na classe `Securityconfigurations` do projeto:
+```java
+@EnableMethodSecurity(securedEnabled = true)
+```
+- Mais detalhes sobre o recurso de method security na documentação do Spring Security, disponível em: https://docs.spring.io/spring-security/reference/servlet/authorization/method-security.html
