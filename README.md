@@ -62,9 +62,9 @@
 - Simplificando, um repositório também lida com dados e oculta consultas semelhantes ao DAO. No entanto, ele fica em um nível mais alto, mais próximo da lógica de negócios de uma aplicação. Um repositório está vinculado à regra de negócio da aplicação e está associado ao agregado dos seus objetos de negócio, retornando-os quando preciso.
 - Só que devemos ficar atentos, pois assim como no padrão DAO, regras de negócio que estão envolvidas com processamento de informações não devem estar presentes nos repositórios. Os repositórios não devem ter a responsabilidade de tomar decisões, aplicar algoritmos de transformação de dados ou prover serviços diretamente a outras camadas ou módulos da aplicação.
 - Mapear entidades de domínio e prover as funcionalidades da aplicação são responsabilidades muito distintas.
-- m repositório fica entre as regras de negócio e a camada de persistência:
-- 1. Ele provê uma interface para as regras de negócio onde os objetos são acessados como em uma coleção;
-- 2. Ele usa a camada de persistência para gravar e recuperar os dados necessários para persistir e recuperar os objetos de negócio.
+- Um repositório fica entre as regras de negócio e a camada de persistência:
+- I. Ele provê uma interface para as regras de negócio onde os objetos são acessados como em uma coleção;
+- II. Ele usa a camada de persistência para gravar e recuperar os dados necessários para persistir e recuperar os objetos de negócio.
 
 ### Por que o padrão repository ao invés do DAO utilizando Spring?
 - O padrão de repositório incentiva um design orientado a domínio, fornecendo uma compreensão mais fácil do domínio e da estrutura de dados.
