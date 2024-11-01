@@ -12,6 +12,8 @@
 - Erros requisicao HTTP:
 > https://http.cat/ <br>
 > https://http.dog/ <br>
+- Fundamentos de REST:
+> https://www.alura.com.br/artigos/rest-conceito-e-fundamentos <br>
 
 # Aula 1
 - Criar um projeto Spring Boot utilizando o site Spring Initializr;
@@ -44,6 +46,12 @@
 - Mapear requisições DELETE com a anotação `@DeleteMapping`;
 - Mapear parâmetros dinâmicos em URL com a anotação `@PathVariable`;
 - Implementar o conceito de exclusão lógica com o uso de um atributo booleano.
+
+# Aula 6
+- Utilizar a classe `ResponseEntity`, do Spring, para personalizar os reetornos dos metodos de uma classe Controller;
+- Modificar o codigo HTTP devolvido nas respostas API;
+- Adicionar cabecalhos nas respostas da API;
+- Utilizar os codigos HTTP mais apropriados para cada operacao realizada na API.
 
 > Regras de negocio seguidos no curso: https://trello.com/b/O0lGCsKb/api-voll-med <br>
 
