@@ -38,6 +38,8 @@ public class Paciente {
     }
 
 
+
+
     public void atualizarInformacoes(@Valid DadosAtualizacaoPaciente dados) {
         if(dados.nome()!=null) {
             this.nome= dados.nome();

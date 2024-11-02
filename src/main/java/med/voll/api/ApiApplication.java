@@ -2,6 +2,7 @@ package med.voll.api;
 
 import med.voll.api.domain.medico.MedicoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -11,6 +12,7 @@ public class ApiApplication {
 	private MedicoRepository repository; //Injecao de dependencias...
 
 	public static void main(String[] args) {
+
 		SpringApplication.run(ApiApplication.class, args);
 	}
 
