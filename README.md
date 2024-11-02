@@ -675,9 +675,9 @@ public class ApiApplication extends SpringBootServletInitializer {
 </plugin>
 ```
 - Pronto! Essa é a única alteração necessária no projeto. Após isso, a geração da imagem deve ser feita via terminal, com o seguinte comando Maven sendo executado no diretório raiz do projeto:
-``
+```
 ./mvnw -Pnative native:compile
-``
+```
 - O comando anterior pode levar vários minutos para finalizar sua execução, sendo totalmente normal essa demora.
 - Atenção! Para executar o comando anterior e gerar a imagem nativa do projeto, é necessário que você tenha instalado em seu computador o  GraalVM (máquina virtual Java com suporte ao recurso de Native Image) em uma versão igual ou superior a 22.3 : https://www.graalvm.org/
 - Após o comando anterior finalizar, será gerado no terminal um log como o seguinte:
@@ -710,8 +710,8 @@ Finished generating 'api' in 2m 50s.
 [INFO] ------------------------------------------------------------------------
 ```
 - A imagem nativa é gerada no diretório `target`, juntamente com o arquivo `.jar` da aplicação, como um arquivo executável de nome api, conforme demonstrado na imagem a seguir:
-``
+```
   INFO 127815 --- [restartedMain] med.voll.api.ApiApplication : Started ApiApplication in 0.3 seconds (process running for 0.304)
-``
+```
 - Repare que a aplicação levou menos de meio segundo para inicializar, algo realmente impressionante, pois quando a executamos pela JVM, via arquivo .jar, esse tempo sobe para algo em torno de 5 segundos.
 - Para saber mais detalhes sobre a geração de uma imagem nativa com Spring Boot 3 acesse a documentação no site: https://docs.spring.io/spring-boot/reference/packaging/native-image/index.html
